@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "l2_v*"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -259,6 +260,27 @@ jobs:
   #           ${{ !contains(github.ref_name, 'rc') && 'ghcr.io/commit-boost/signer:latest' || '' }}
   #         file: provisioning/signer.Dockerfile
 
+  build-l2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Rustup toolchain install
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Add Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build ethrex L2
+        run: cargo build --release --features l2 --bin ethrex
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ethrex-linux_x86-64
+          path: ./target/release/ethrex
+
   # Creates a draft release on GitHub with the binaries
   finalize-release:
     # needs:
@@ -268,21 +290,16 @@ jobs:
     #   - build-and-push-signer-docker
     runs-on: ubuntu-latest
     steps:
-      # - name: Download artifacts
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     path: ./artifacts
-      #     pattern: "commit-boost-*"
-
-      - name: Create files
-        run: |
-          mkdir ./tests
-          echo "Test" > ./tests/test.txt
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./bin
+          pattern: "ethrex-*"
 
       - name: Finalize Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ./tests/**/*
+          files: ./bin/**/*
           draft: true
           prerelease: false
           tag_name: ${{ github.ref_name }}
