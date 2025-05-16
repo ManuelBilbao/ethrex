@@ -267,7 +267,7 @@ jobs:
           - ubuntu-latest
           - ubuntu-24.04-arm
           - macos-latest
-        includes:
+        include:
           - platform: ubuntu-latest
             os: linux
             arch: x86-64
