@@ -261,6 +261,22 @@ jobs:
   #         file: provisioning/signer.Dockerfile
 
   build-l2:
+    strategy:
+      matrix:
+        platform:
+          - ubuntu-latest
+          - ubuntu-24.04-arm
+          - macos-latest
+        includes:
+          - platform: ubuntu-latest
+            os: linux
+            arch: x86-64
+          - platform: ubuntu-24.04-arm
+            os: linux
+            arch: arm64
+          - platform: macos-latest
+            os: macos
+            arch: arm64
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -278,7 +294,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ethrex-linux_x86-64
+          name: ethrex-${{ matrix.os }}_${{ matrix.arch }}
           path: ./target/release/ethrex
 
   # Creates a draft release on GitHub with the binaries
