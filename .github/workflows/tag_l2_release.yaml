@@ -289,13 +289,15 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build ethrex L2
-        run: cargo build --release --features l2 --bin ethrex
+        run: |
+          cargo build --release --features l2 --bin ethrex
+          mv target/release/ethrex ethrex-${{ matrix.os }}_${{ matrix.arch }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ethrex-${{ matrix.os }}_${{ matrix.arch }}
-          path: ./target/release/ethrex
+          path: ethrex-${{ matrix.os }}_${{ matrix.arch }}
 
   # Creates a draft release on GitHub with the binaries
   finalize-release:
