@@ -283,11 +283,8 @@ jobs:
 
   # Creates a draft release on GitHub with the binaries
   finalize-release:
-    # needs:
-    #   - build-binaries-linux
-    #   - build-binaries-darwin
-    #   - build-and-push-pbs-docker
-    #   - build-and-push-signer-docker
+    needs:
+      - build-l2
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
