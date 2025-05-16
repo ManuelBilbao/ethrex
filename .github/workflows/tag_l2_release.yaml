@@ -1,0 +1,291 @@
+name: Draft Release
+
+on:
+  push:
+    tags:
+      - "l2_v*"
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  # # Builds the x64 and arm64 binaries for Linux, via the Docker builder
+  # build-binaries-linux:
+  #   strategy:
+  #     # {target: amd64, name: ethrex_l2, package-suffix: x86-64, target-crate: ethrex-l2}
+  #     # {target: amd64, name: ethrex_prover, package-suffix: x86-64, target-crate: ethrex-prover}
+  #     # {target: arm64, name: ethrex_l2, package-suffix: arm64, target-crate: ethrex-l2}
+  #     # {target: arm64, name: ethrex_prover, package-suffix: arm64, target-crate: ethrex-prover}
+  #     matrix:
+  #       target:
+  #         - amd64
+  #         - arm64
+  #       name:
+  #         - ethrex_l2
+  #         - ethrex_prover
+  #       include:
+  #         - target: amd64
+  #           package-suffix: x86-64
+  #         - target: arm64
+  #           package-suffix: arm64
+  #         - name: ethrex_l2
+  #           target-crate: ethrex-l2
+  #         - name: ethrex_prover
+  #           target-crate: ethrex-prover
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         ref: "stable"
+  #         fetch-depth: 0
+  #         submodules: true
+
+  #     - name: Log commit hash
+  #       run: |
+  #         echo "Releasing commit: $(git rev-parse HEAD)"
+
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+
+  #     - name: Login to GitHub Container Registry
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+
+  #     - name: Build binary (Linux)
+  #       uses: docker/build-push-action@v6
+  #       with:
+  #         context: .
+  #         push: false
+  #         platforms: linux/amd64,linux/arm64
+  #         cache-from: type=registry,ref=ghcr.io/ManuelBilbao/buildcache:${{ matrix.target-crate}}
+  #         cache-to: type=registry,ref=ghcr.io/ManuelBilbao/buildcache:${{ matrix.target-crate }},mode=max
+  #         file: crates/l2/Dockerfile
+  #         outputs: type=local,dest=build
+  #         build-args: |
+  #           TARGET_CRATE=${{ matrix.name }}
+
+  #     - name: Package binary (Linux)
+  #       run: |
+  #         cd build/linux_${{ matrix.target }}
+  #         tar -czvf ${{ matrix.name }}-${{ github.ref_name }}-linux_${{ matrix.package-suffix }}.tar.gz ${{ matrix.name }}
+  #         mv ${{ matrix.name }}-${{ github.ref_name }}-linux_${{ matrix.package-suffix }}.tar.gz ../../
+
+  #     - name: Upload artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ${{ matrix.name }}-${{ github.ref_name }}-linux_${{ matrix.package-suffix }}
+  #         path: |
+  #           ${{ matrix.name }}-${{ github.ref_name }}-linux_${{ matrix.package-suffix }}.tar.gz
+
+  # # Builds the arm64 binaries for Darwin
+  # build-binaries-darwin:
+  #   strategy:
+  #     matrix:
+  #       target:
+  #         - aarch64-apple-darwin
+  #       name:
+  #         - ethrex_l2
+  #         - ethrex_prover
+  #       include:
+  #         - target: aarch64-apple-darwin
+  #           os: macos-latest
+  #           package-suffix: arm64
+  #   runs-on: ${{ matrix.os }}
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         ref: "stable"
+  #         fetch-depth: 0
+  #         submodules: true
+
+  #     - name: Log commit hash
+  #       run: |
+  #         echo "Releasing commit: $(git rev-parse HEAD)"
+
+  #     - name: Install Protoc
+  #       run:
+  #         # Brew's version is much more up to date than the Linux ones, and installing the latest via script runs into curl issues so for now, brew's easier to use
+  #         # provisioning/protoc.sh
+  #         brew install protobuf
+
+  #     - name: Cache Cargo registry
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: ~/.cargo/registry
+  #         key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+  #     - name: Cache Cargo index
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: ~/.cargo/git
+  #         key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+
+  #     - name: Cache Cargo build
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: target
+  #         key: ${{ runner.os }}-cargo-build-${{ matrix.target }}-${{ matrix.name }}-${{ hashFiles('**/Cargo.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-cargo-build-${{ matrix.target }}-${{ matrix.name }}-
+  #           ${{ runner.os }}-cargo-build-${{ matrix.target }}-
+  #           ${{ runner.os }}-cargo-build-
+
+  #     - name: Build binary (Darwin)
+  #       run: cargo build --release --target ${{ matrix.target }} --bin ${{ matrix.name }}
+
+  #     - name: Package binary (Darwin)
+  #       run: |
+  #         cd target/${{ matrix.target }}/release
+  #         tar -czvf ${{ matrix.name }}-${{ github.ref_name }}-darwin_${{ matrix.package-suffix }}.tar.gz ${{ matrix.name }}
+  #         mv ${{ matrix.name }}-${{ github.ref_name }}-darwin_${{ matrix.package-suffix }}.tar.gz ../../../
+
+  #     - name: Upload artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ${{ matrix.name }}-${{ github.ref_name }}-darwin_${{ matrix.package-suffix }}
+  #         path: |
+  #           ${{ matrix.name }}-${{ github.ref_name }}-darwin_${{ matrix.package-suffix }}.tar.gz
+
+  # # Builds the PBS Docker image
+  # build-and-push-pbs-docker:
+  #   needs: [build-binaries-linux]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         ref: "stable"
+  #         fetch-depth: 0
+  #         submodules: true
+
+  #     - name: Download binary archives
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         path: ./artifacts
+  #         pattern: "commit-boost-*"
+
+  #     - name: Extract binaries
+  #       run: |
+  #         mkdir -p ./artifacts/bin
+  #         tar -xzf ./artifacts/commit-boost-pbs-${{ github.ref_name }}-linux_x86-64/commit-boost-pbs-${{ github.ref_name }}-linux_x86-64.tar.gz -C ./artifacts/bin
+  #         mv ./artifacts/bin/commit-boost-pbs ./artifacts/bin/commit-boost-pbs-linux-amd64
+  #         tar -xzf ./artifacts/commit-boost-pbs-${{ github.ref_name }}-linux_arm64/commit-boost-pbs-${{ github.ref_name }}-linux_arm64.tar.gz -C ./artifacts/bin
+  #         mv ./artifacts/bin/commit-boost-pbs ./artifacts/bin/commit-boost-pbs-linux-arm64
+
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+
+  #     - name: Login to GitHub Container Registry
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+
+  #     - name: Build and push PBS Docker image
+  #       uses: docker/build-push-action@v6
+  #       with:
+  #         context: .
+  #         push: true
+  #         platforms: linux/amd64,linux/arm64
+  #         build-args: |
+  #           BINARIES_PATH=./artifacts/bin
+  #         tags: |
+  #           ghcr.io/commit-boost/pbs:${{ github.ref_name }}
+  #           ${{ !contains(github.ref_name, 'rc') && 'ghcr.io/commit-boost/pbs:latest' || '' }}
+  #         file: provisioning/pbs.Dockerfile
+
+  # # Builds the Signer Docker image
+  # build-and-push-signer-docker:
+  #   needs: [build-binaries-linux]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         ref: "stable"
+  #         fetch-depth: 0
+  #         submodules: true
+
+  #     - name: Download binary archives
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         path: ./artifacts
+  #         pattern: "commit-boost-*"
+
+  #     - name: Extract binaries
+  #       run: |
+  #         mkdir -p ./artifacts/bin
+  #         tar -xzf ./artifacts/commit-boost-signer-${{ github.ref_name }}-linux_x86-64/commit-boost-signer-${{ github.ref_name }}-linux_x86-64.tar.gz -C ./artifacts/bin
+  #         mv ./artifacts/bin/commit-boost-signer ./artifacts/bin/commit-boost-signer-linux-amd64
+  #         tar -xzf ./artifacts/commit-boost-signer-${{ github.ref_name }}-linux_arm64/commit-boost-signer-${{ github.ref_name }}-linux_arm64.tar.gz -C ./artifacts/bin
+  #         mv ./artifacts/bin/commit-boost-signer ./artifacts/bin/commit-boost-signer-linux-arm64
+
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+
+  #     - name: Login to GitHub Container Registry
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+
+  #     - name: Build and push Signer Docker image
+  #       uses: docker/build-push-action@v6
+  #       with:
+  #         context: .
+  #         push: true
+  #         platforms: linux/amd64,linux/arm64
+  #         build-args: |
+  #           BINARIES_PATH=./artifacts/bin
+  #         tags: |
+  #           ghcr.io/commit-boost/signer:${{ github.ref_name }}
+  #           ${{ !contains(github.ref_name, 'rc') && 'ghcr.io/commit-boost/signer:latest' || '' }}
+  #         file: provisioning/signer.Dockerfile
+
+  # Creates a draft release on GitHub with the binaries
+  finalize-release:
+    # needs:
+    #   - build-binaries-linux
+    #   - build-binaries-darwin
+    #   - build-and-push-pbs-docker
+    #   - build-and-push-signer-docker
+    runs-on: ubuntu-latest
+    steps:
+      # - name: Download artifacts
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     path: ./artifacts
+      #     pattern: "commit-boost-*"
+
+      - name: Create files
+        run: |
+          mkdir ./tests
+          echo "Test" > ./tests/test.txt
+
+      - name: Finalize Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./tests/**/*
+          draft: true
+          prerelease: false
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
