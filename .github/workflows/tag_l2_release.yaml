@@ -327,6 +327,11 @@ jobs:
         with:
           toolchain: nightly-2024-11-27
 
+      - name: Install Pico
+        run: |
+          rustup component add rust-src --toolchain nightly-2024-11-27
+          cargo +nightly-2024-11-27 install --git https://github.com/brevis-network/pico pico-cli
+
       - name: Add Rust Cache
         uses: Swatinem/rust-cache@v2
 
@@ -373,7 +378,7 @@ jobs:
 
       - name: Install SP1
         env:
-          SHELL: bash
+          SHELL: /bin/bash
         run: |
           curl -L https://sp1up.succinct.xyz | bash
           ~/.sp1/bin/sp1up --version 4.1.7
@@ -400,7 +405,6 @@ jobs:
       matrix:
         platform:
           - ubuntu-latest
-          - ubuntu-24.04-arm
           - macos-latest
         include:
           - platform: ubuntu-latest
