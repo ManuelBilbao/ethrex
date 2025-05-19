@@ -441,7 +441,9 @@ jobs:
   finalize-release:
     needs:
       - build-l2
-      - build-prover
+      - build-prover-pico
+      - build-prover-sp1
+      - build-prover-risc0
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
