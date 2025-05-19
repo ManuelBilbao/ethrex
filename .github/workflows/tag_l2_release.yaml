@@ -372,6 +372,8 @@ jobs:
           toolchain: 1.82.0
 
       - name: Install SP1
+        env:
+          SHELL: bash
         run: |
           curl -L https://sp1up.succinct.xyz | bash
           ~/.sp1/bin/sp1up --version 4.1.7
@@ -417,6 +419,8 @@ jobs:
 
       - name: Rustup toolchain install
         uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.82.0
 
       - name: Install RISC0
         run: |
