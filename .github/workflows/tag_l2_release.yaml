@@ -306,6 +306,10 @@ jobs:
           - ubuntu-latest
           - ubuntu-24.04-arm
           - macos-latest
+        backend:
+          - SP1
+          - RISC0
+          - Pico
         include:
           - platform: ubuntu-latest
             os: linux
@@ -316,6 +320,12 @@ jobs:
           - platform: macos-latest
             os: macos
             arch: arm64
+          - backend: SP1
+            prover: sp1
+          - backend: RISC0
+            prover: risc0
+          - backend: Pico
+            prover: pico
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout code
@@ -337,8 +347,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ethrex_prover-${{ matrix.os }}_${{ matrix.arch }}
-          path: ethrex_prover-${{ matrix.os }}_${{ matrix.arch }}
+          name: ethrex_prover_${{ matrix.prover }}-${{ matrix.os }}_${{ matrix.arch }}
+          path: ethrex_prover_${{ matrix.prover }}-${{ matrix.os }}_${{ matrix.arch }}
 
   # Creates a draft release on GitHub with the binaries
   finalize-release:
