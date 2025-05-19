@@ -192,7 +192,7 @@ build-prover:
 	fi; \
 
 	RUSTFLAGS='-C target-cpu=native' \
-	cargo +nightly-2024-11-27 build --release --features "$$PROVER$$GPU,l2" \
+	cargo $$TOOLCHAIN build --release --features "$$PROVER$$GPU,l2" \
 	--manifest-path ./prover/Cargo.toml  \
 	--bin ethrex_prover
 
