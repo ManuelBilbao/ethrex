@@ -369,11 +369,10 @@ jobs:
       - name: Rustup toolchain install
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Download SP1
-        run: curl -L https://sp1up.succinct.xyz | bash
-
       - name: Install SP1
-        run: sp1up
+        run: |
+          curl -L https://sp1up.succinct.xyz | bash
+          ~/.sp1/bin/sp1up --version 4.1.7
 
       - name: Add Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -417,8 +416,12 @@ jobs:
       - name: Rustup toolchain install
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Download RISC0
-        run: curl -L https://risczero.com/install | bash
+      - name: Install RISC0
+        run: |
+          curl -L https://risczero.com/install | bash
+          ~/.risc0/bin/rzup install
+          ~/.risc0/bin/rzup install cargo-risczero 1.2.0
+          ~/.risc0/bin/rzup default cargo-risczero 1.2.0
 
       - name: Install RISC0
         run: rzup install
