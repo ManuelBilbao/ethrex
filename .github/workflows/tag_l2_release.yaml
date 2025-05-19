@@ -372,6 +372,7 @@ jobs:
       - name: Install SP1
         run: |
           curl -L https://sp1up.succinct.xyz | bash
+          source ~/.bashrc
           sp1up
 
       - name: Add Rust Cache
@@ -419,6 +420,7 @@ jobs:
       - name: Install Risc0
         run: |
           curl -L https://risczero.com/install | bash
+          source ~/.bashrc
           rzup install
 
       - name: Add Rust Cache
