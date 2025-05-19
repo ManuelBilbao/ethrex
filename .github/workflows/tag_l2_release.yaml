@@ -334,6 +334,8 @@ jobs:
 
       - name: Rustup toolchain install
         uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly-2024-11-27
 
       - name: Add Rust Cache
         uses: Swatinem/rust-cache@v2
