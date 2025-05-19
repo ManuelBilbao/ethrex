@@ -427,8 +427,8 @@ jobs:
         run: |
           curl -L https://risczero.com/install | bash
           ~/.risc0/bin/rzup install
-          ~/.risc0/bin/rzup install cargo-risczero 1.2.0
-          ~/.risc0/bin/rzup default cargo-risczero 1.2.0
+          # ~/.risc0/bin/rzup install cargo-risczero 1.2.0
+          # ~/.risc0/bin/rzup default cargo-risczero 1.2.0
 
       - name: Add Rust Cache
         uses: Swatinem/rust-cache@v2
