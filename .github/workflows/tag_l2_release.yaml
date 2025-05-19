@@ -340,7 +340,7 @@ jobs:
       - name: Build ethrex L2
         run: |
           cd crates/l2
-          make build-prover
+          make build-prover PROVER=${{ matrix.prover }}
           cd ../../
           mv target/release/ethrex_prover ethrex_prover-${{ matrix.os }}_${{ matrix.arch }}
 
