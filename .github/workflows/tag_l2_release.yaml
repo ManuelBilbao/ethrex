@@ -70,7 +70,7 @@ jobs:
             os: macos
             arch: arm64
           - backend: sp1
-            mode: exec
+            mode: sp1
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout code
