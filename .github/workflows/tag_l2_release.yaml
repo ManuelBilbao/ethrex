@@ -56,6 +56,9 @@ jobs:
           - ubuntu-latest
           - ubuntu-24.04-arm
           - macos-latest
+        mode:
+          - sp1
+          - exec
         include:
           - platform: ubuntu-latest
             os: linux
@@ -90,15 +93,15 @@ jobs:
       - name: Build ethrex L2
         run: |
           cd crates/l2
-          make build-prover PROVER=sp1
+          make build-prover PROVER=${{ matrix.mode }}
           cd ../../
-          mv target/release/ethrex_prover ethrex_prover_sp1-${{ matrix.os }}_${{ matrix.arch }}
+          mv target/release/ethrex_prover ethrex_prover_${{ matrix.mode }}-${{ matrix.os }}_${{ matrix.arch }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ethrex_prover_sp1-${{ matrix.os }}_${{ matrix.arch }}
-          path: ethrex_prover_sp1-${{ matrix.os }}_${{ matrix.arch }}
+          name: ethrex_prover_${{ matrix.mode }}-${{ matrix.os }}_${{ matrix.arch }}
+          path: ethrex_prover_${{ matrix.mode }}-${{ matrix.os }}_${{ matrix.arch }}
 
   build-prover-risc0:
     if: false
@@ -202,6 +205,7 @@ jobs:
   finalize-release:
     needs:
       - build-l2
+      - build-prover-exec
       - build-prover-sp1
     # - build-prover-risc0
     # - build-prover-pico
