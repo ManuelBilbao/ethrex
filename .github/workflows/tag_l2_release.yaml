@@ -224,6 +224,6 @@ jobs:
           draft: false
           prerelease: false
           tag_name: ${{ github.ref_name }}
-          name: "L2: $RELEASE_NAME"
+          name: "L2: ${{ env.RELEASE_NAME }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
