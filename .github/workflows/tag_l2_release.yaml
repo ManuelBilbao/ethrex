@@ -50,7 +50,6 @@ jobs:
           path: ethrex-${{ matrix.os }}_${{ matrix.arch }}
 
   build-prover-sp1:
-    if: false
     strategy:
       matrix:
         platform:
