@@ -214,6 +214,9 @@ jobs:
           path: ./bin
           pattern: "ethrex*"
 
+      - name: Format name
+        run: echo "RELEASE_NAME=${${{ github.ref_name }}:4}" >> $GITHUB_ENV
+
       - name: Finalize Release
         uses: softprops/action-gh-release@v2
         with:
@@ -221,6 +224,6 @@ jobs:
           draft: false
           prerelease: false
           tag_name: ${{ github.ref_name }}
-          name: "L2: ${{ github.ref_name.substr(4) }}"
+          name: "L2: $RELEASE_NAME"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
