@@ -79,6 +79,7 @@ jobs:
       - name: Install SP1
         env:
           SHELL: /bin/bash
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           curl -L https://sp1up.succinct.xyz | bash
           ~/.sp1/bin/sp1up --version 4.1.7
@@ -217,6 +218,8 @@ jobs:
 
       - name: Finalize Release
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: ./bin/**/*
           draft: false
@@ -224,5 +227,3 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: "L2: ${{ env.RELEASE_NAME }}"
           body: ""
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
