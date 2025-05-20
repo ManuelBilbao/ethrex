@@ -97,16 +97,16 @@ jobs:
           cd crates/l2
           make build-prover PROVER=${{ matrix.mode }}
           cd ../../
-          mv target/release/ethrex_prover ethrex_prover_${{ matrix.mode }}-${{ matrix.os }}_${{ matrix.arch }}
+          mv target/release/ethrex_prover ethrex_prover_${{ matrix.backend }}-${{ matrix.os }}_${{ matrix.arch }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ethrex_prover_${{ matrix.mode }}-${{ matrix.os }}_${{ matrix.arch }}
-          path: ethrex_prover_${{ matrix.mode }}-${{ matrix.os }}_${{ matrix.arch }}
+          name: ethrex_prover_${{ matrix.backend }}-${{ matrix.os }}_${{ matrix.arch }}
+          path: ethrex_prover_${{ matrix.backend }}-${{ matrix.os }}_${{ matrix.arch }}
 
   build-prover-risc0:
-    if: false
+    if: false # Remove when fixed RISC0
     strategy:
       matrix:
         platform:
@@ -155,7 +155,7 @@ jobs:
           path: ethrex_prover_risc0-${{ matrix.os }}_${{ matrix.arch }}
 
   build-prover-pico:
-    if: false
+    if: false # Remove when fixed Pico
     strategy:
       matrix:
         platform:
@@ -208,8 +208,8 @@ jobs:
     needs:
       - build-l2
       - build-prover-sp1
-    # - build-prover-risc0
-    # - build-prover-pico
+    # - build-prover-risc0 # Uncomment when fixed RISC0
+    # - build-prover-pico # Uncomment when fixed Pico
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
