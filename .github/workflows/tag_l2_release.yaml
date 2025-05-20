@@ -58,7 +58,7 @@ jobs:
           - ubuntu-latest
           - ubuntu-24.04-arm
           - macos-latest
-        mode:
+        backend:
           - sp1
           - exec
         include:
@@ -71,6 +71,8 @@ jobs:
           - platform: macos-latest
             os: macos
             arch: arm64
+          - backend: sp1
+            mode: exec
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout code
