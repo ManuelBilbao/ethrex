@@ -340,7 +340,7 @@ jobs:
           cd crates/l2
           make build-prover TOOLCHAIN=+nightly-2024-11-27 PROVER=pico
           cd ../../
-          mv target/release/ethrex_prover ethrex_prover-${{ matrix.os }}_${{ matrix.arch }}
+          mv target/release/ethrex_prover ethrex_prover_pico-${{ matrix.os }}_${{ matrix.arch }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -391,7 +391,7 @@ jobs:
           cd crates/l2
           make build-prover PROVER=sp1
           cd ../../
-          mv target/release/ethrex_prover ethrex_prover-${{ matrix.os }}_${{ matrix.arch }}
+          mv target/release/ethrex_prover ethrex_prover_sp1-${{ matrix.os }}_${{ matrix.arch }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -424,6 +424,8 @@ jobs:
           toolchain: 1.82.0
 
       - name: Install RISC0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           curl -L https://risczero.com/install | bash
           ~/.risc0/bin/rzup install
@@ -438,7 +440,7 @@ jobs:
           cd crates/l2
           make build-prover PROVER=risc0
           cd ../../
-          mv target/release/ethrex_prover ethrex_prover-${{ matrix.os }}_${{ matrix.arch }}
+          mv target/release/ethrex_prover ethrex_prover_risc0-${{ matrix.os }}_${{ matrix.arch }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
