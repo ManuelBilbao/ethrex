@@ -64,7 +64,7 @@ pub fn main() {
         let mut vm = Evm::from_prover_db(db.clone());
         let result = vm.execute_block(&block).expect("failed to execute block");
         let receipts = result.receipts;
-        let account_updates = vm.get_state_transitions()?;
+        let account_updates = vm.get_state_transitions().unwrap();
 
         // Get L2 withdrawals for this block
         #[cfg(feature = "l2")]
