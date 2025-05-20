@@ -229,6 +229,7 @@ jobs:
       - name: Get previous tag
         run: |
           name=$(git --no-pager tag --sort=creatordate --merged ${{ github.ref_name }} | tail -2 | head -1)
+          git --no-pager tag --sort=creatordate --merged ${{ github.ref_name }}
           echo "PREVIOUS_TAG: $name"
           echo "PREVIOUS_TAG=$name" >> $GITHUB_ENV
 
