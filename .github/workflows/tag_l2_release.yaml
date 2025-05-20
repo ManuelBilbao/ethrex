@@ -216,6 +216,21 @@ jobs:
       - name: Format name
         run: echo "RELEASE_NAME=$(echo ${{ github.ref_name }} | cut -d_ -f2)" >> $GITHUB_ENV
 
+      - name: Get previous tag
+        run: |
+          name=$(git --no-pager tag --sort=creatordate --merged ${{ github.ref_name }} | tail -2 | head -1)
+          echo "PREVIOUS_TAG: $name"
+          echo "PREVIOUS_TAG=$name" >> $GITHUB_ENV
+
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fromTag: ${{ github.ref_name }}
+          toTag: ${{ env.PREVIOUS_TAG }}
+          writeToFile: false
+
       - name: Finalize Release
         uses: softprops/action-gh-release@v2
         env:
@@ -226,4 +241,4 @@ jobs:
           prerelease: false
           tag_name: ${{ github.ref_name }}
           name: "L2: ${{ env.RELEASE_NAME }}"
-          body: ""
+          body: ${{ steps.changelog.outputs.changes }}
