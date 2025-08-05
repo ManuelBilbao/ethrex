@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1754431301759,
+  "lastUpdate": 1754433334152,
   "repoUrl": "https://github.com/ManuelBilbao/ethrex",
   "entries": {
     "Benchmark": [
@@ -89,6 +89,36 @@ window.BENCHMARK_DATA = {
             "name": "Block import/Block import ERC20 transfers",
             "value": 160802969274,
             "range": "± 260901662",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "manuel.bilbao@lambdaclass.com",
+            "name": "Manuel Iñaki Bilbao",
+            "username": "ManuelBilbao"
+          },
+          "committer": {
+            "email": "manuel.bilbao@lambdaclass.com",
+            "name": "Manuel Iñaki Bilbao",
+            "username": "ManuelBilbao"
+          },
+          "distinct": true,
+          "id": "dd00a9358672ce34b8f7b2fffb690abcf099d787",
+          "message": "Use random salt in docker compose",
+          "timestamp": "2025-08-05T18:51:28-03:00",
+          "tree_id": "4864f71a59190a1f4f740a73e3b5a962161b45b9",
+          "url": "https://github.com/ManuelBilbao/ethrex/commit/dd00a9358672ce34b8f7b2fffb690abcf099d787"
+        },
+        "date": 1754433331687,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "Block import/Block import ERC20 transfers",
+            "value": 161957494066,
+            "range": "± 460512423",
             "unit": "ns/iter"
           }
         ]
