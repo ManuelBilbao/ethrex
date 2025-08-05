@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1754433334152,
+  "lastUpdate": 1754434722548,
   "repoUrl": "https://github.com/ManuelBilbao/ethrex",
   "entries": {
     "Benchmark": [
@@ -119,6 +119,36 @@ window.BENCHMARK_DATA = {
             "name": "Block import/Block import ERC20 transfers",
             "value": 161957494066,
             "range": "± 460512423",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "manuel.bilbao@lambdaclass.com",
+            "name": "Manuel Iñaki Bilbao",
+            "username": "ManuelBilbao"
+          },
+          "committer": {
+            "email": "manuel.bilbao@lambdaclass.com",
+            "name": "Manuel Iñaki Bilbao",
+            "username": "ManuelBilbao"
+          },
+          "distinct": true,
+          "id": "c990293a3bda5dc3b924f4660e31e1a461bf9bdd",
+          "message": "fix(ci): change registry",
+          "timestamp": "2025-08-05T19:22:12-03:00",
+          "tree_id": "350d2c1dca8072e2f4a8b8c97c451531b9f8362b",
+          "url": "https://github.com/ManuelBilbao/ethrex/commit/c990293a3bda5dc3b924f4660e31e1a461bf9bdd"
+        },
+        "date": 1754434720133,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "Block import/Block import ERC20 transfers",
+            "value": 163775713333,
+            "range": "± 366262619",
             "unit": "ns/iter"
           }
         ]
