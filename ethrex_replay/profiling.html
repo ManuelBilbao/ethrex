@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Installing ethrex - Ethrex</title>
+        <title>Profiling - Ethrex</title>
 
 
         <!-- Custom HTML head -->
@@ -237,107 +237,55 @@
 }
 
 </style>
-<h1 id="installing-ethrex"><a class="header" href="#installing-ethrex">Installing ethrex</a></h1>
-<p>Before <a href="./running.html">running the ethrex client</a>, you need to install it.
-We have multiple ways to install, depending on your needs.</p>
-<p>Pre-built binaries for Linux and macOS are available for each release.
-See <a href="#installing-from-pre-built-binaries">Installing from pre-built binaries</a> for installation instructions.</p>
-<p>You can also <a href="#installing-through-cargo-install">install through cargo install</a>, or <a href="#building-from-source">build the client from source</a>.</p>
-<h2 id="installing-from-pre-built-binaries"><a class="header" href="#installing-from-pre-built-binaries">Installing from pre-built binaries</a></h2>
-<p>To install ethrex from pre-built binaries, first download the binaries for your platform from the <a href="https://github.com/lambdaclass/ethrex/releases">release page</a>.
-You can also download it from the command line using <code>curl</code> or <code>wget</code>:</p>
-<pre><code class="language-sh"># For Linux x86_64
-curl -L https://github.com/lambdaclass/ethrex/releases/latest/download/ethrex-linux_x86_64 -o ethrex
-wget https://github.com/lambdaclass/ethrex/releases/latest/download/ethrex-linux_x86_64 -O ethrex
-
-# For Linux ARM
-curl -L https://github.com/lambdaclass/ethrex/releases/latest/download/ethrex-linux_aarch64 -o ethrex
-wget https://github.com/lambdaclass/ethrex/releases/latest/download/ethrex-linux_aarch64 -O ethrex
-
-# For MacOS
-curl -L https://github.com/lambdaclass/ethrex/releases/latest/download/ethrex-macos_aarch64 -o ethrex
-wget https://github.com/lambdaclass/ethrex/releases/latest/download/ethrex-macos_aarch64 -O ethrex
+<h1 id="profiling-zkvms-with-ethrex-replay"><a class="header" href="#profiling-zkvms-with-ethrex-replay">Profiling zkvms with ethrex-replay</a></h1>
+<h2 id="getting-started"><a class="header" href="#getting-started">Getting started</a></h2>
+<p>Before reading this document please take a look the general documentation for <a href="./ethrex_replay.html">ethrex-replay</a></p>
+<h3 id="dependencies"><a class="header" href="#dependencies">Dependencies</a></h3>
+<h4 id="for-sp1"><a class="header" href="#for-sp1">For SP1</a></h4>
+<p>The easiest way is to use cargo but other options are listed in the <a href="https://github.com/mstange/samply">samply repo</a></p>
+<pre><code>cargo install --locked samply
 </code></pre>
-<p>And set the execution bit:</p>
-<pre><code class="language-sh">chmod +x ethrex
+<h4 id="for-risc0"><a class="header" href="#for-risc0">For risc0</a></h4>
+<p>Install go by following the instructions from <a href="https://go.dev/doc/install">go install page</a></p>
+<h3 id="generate-a-profile"><a class="header" href="#generate-a-profile">Generate a profile</a></h3>
+<h4 id="for-sp1-1"><a class="header" href="#for-sp1-1">For SP1</a></h4>
+<p><strong>Profile a L1 block</strong>:</p>
+<p>Required: <code>RPC_URL</code>.
+Optionally: <code>BLOCK_NUMBER</code>, <code>NETWORK</code>.</p>
+<pre><code class="language-sh">make profile-sp1
 </code></pre>
-<p>After that, you can verify the program is working by running:</p>
-<pre><code class="language-sh">./ethrex --version
+<p><strong>Profile a L2 batch</strong>:</p>
+<p>Required: <code>RPC_URL</code>, <code>BATCH_NUMBER</code>, <code>NETWORK</code>.</p>
+<pre><code class="language-sh">make profile-batch-sp1
 </code></pre>
-<p>This should output something like:</p>
-<pre><code class="language-text">ethrex ethrex/v0.1.0-HEAD-23191af/aarch64-apple-darwin/rustc-v1.87.0
+<p><strong>Open samply profile</strong></p>
+<pre><code class="language-sh">samply load output.json
 </code></pre>
-<div class="mdbook-alerts mdbook-alerts-tip">
-<p class="mdbook-alerts-title">
-  <span class="mdbook-alerts-icon"></span>
-  tip
-</p>
-<p>For convenience, you can move the <code>ethrex</code> binary to a directory in your <code>PATH</code>, so you can run it from anywhere.</p>
-</div>
-<p>After installing the client, see <a href="./running.html">"Running the client"</a> for instructions on how to use it to run L1 and/or L2 networks.</p>
-<h2 id="installing-through-cargo-install"><a class="header" href="#installing-through-cargo-install">Installing through <code>cargo install</code></a></h2>
-<p>To install the client, <a href="https://www.rust-lang.org/tools/install">first install Rust</a> and then run:</p>
-<pre><code class="language-sh">cargo install --locked ethrex \
-    --git https://github.com/lambdaclass/ethrex.git \
-    --tag &lt;LATEST_VERSION_HERE&gt; \
+<p>Then visit http://localhost:8000/ on your browser</p>
+<h4 id="for-risc0-1"><a class="header" href="#for-risc0-1">For risc0</a></h4>
+<p><strong>Profile a L1 block</strong>:</p>
+<p>Required: <code>RPC_URL</code>.
+Optionally: <code>BLOCK_NUMBER</code>, <code>NETWORK</code>.</p>
+<pre><code class="language-sh">make profile-risc0
 </code></pre>
-<p>This installs the <code>ethrex</code> binary.
-For more information on how it is built and installed, see <a href="https://doc.rust-lang.org/cargo/commands/cargo-install.html">the cargo-install documentation</a>.</p>
-<p>After that, you can verify the program is working by running:</p>
-<pre><code class="language-sh">ethrex --version
+<p><strong>Profile a L2 batch</strong>:</p>
+<p>Required: <code>RPC_URL</code>, <code>BATCH_NUMBER</code>, <code>NETWORK</code>.</p>
+<pre><code class="language-sh">make profile-batch-risc0
 </code></pre>
-<p>This should output something like:</p>
-<pre><code class="language-text">ethrex ethrex/v0.1.0-HEAD-23191af/aarch64-apple-darwin/rustc-v1.87.0
+<p><strong>Open pprof profile</strong></p>
+<pre><code class="language-sh">go tool pprof -http=127.0.0.1:8000 profile.pb
 </code></pre>
-<p>After installing the client, see <a href="./running.html">"Running the client"</a> for instructions on how to use it to run L1 and/or L2 networks.</p>
-<div class="mdbook-alerts mdbook-alerts-tip">
-<p class="mdbook-alerts-title">
-  <span class="mdbook-alerts-icon"></span>
-  tip
-</p>
-<p>You can add <code>sp1</code> and <code>risc0</code> features to the installation script to build with support for SP1
-and/or RISC0 provers. <code>gpu</code> feature is also available for CUDA support.</p>
-</div>
-<h2 id="building-from-source"><a class="header" href="#building-from-source">Building from source</a></h2>
-<p>This section assumes you already have <a href="https://www.rust-lang.org/tools/install">Rust's <code>cargo</code></a> and <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git"><code>git</code></a> installed.</p>
-<p>You can download the source code of a release from the <a href="https://github.com/lambdaclass/ethrex/releases">GitHub releases page</a>, or by cloning the repository at that version:</p>
-<pre><code class="language-sh">git clone --branch &lt;LATEST_VERSION_HERE&gt; --depth 1 https://github.com/lambdaclass/ethrex.git
-</code></pre>
-<p>After that, you can run the following command inside the cloned repo to build the client:</p>
-<pre><code class="language-sh">cargo build --bin ethrex --release
-</code></pre>
-<p>You can find the built binary inside <code>target/release</code> directory:</p>
-<pre><code class="language-sh">./target/release/ethrex --version
-</code></pre>
-<p>This should output something like:</p>
-<pre><code class="language-text">ethrex ethrex/v0.1.0-HEAD-23191af/aarch64-apple-darwin/rustc-v1.87.0
-</code></pre>
-<div class="mdbook-alerts mdbook-alerts-tip">
-<p class="mdbook-alerts-title">
-  <span class="mdbook-alerts-icon"></span>
-  tip
-</p>
-<p>You can add <code>sp1</code> and <code>risc0</code> features to the installation script to build with support for SP1
-and/or RISC0 provers. <code>gpu</code> feature is also available for CUDA support.</p>
-</div>
-<div class="mdbook-alerts mdbook-alerts-tip">
-<p class="mdbook-alerts-title">
-  <span class="mdbook-alerts-icon"></span>
-  tip
-</p>
-<p>For convenience, you can move the <code>ethrex</code> binary to a directory in your <code>PATH</code>, so you can run it from anywhere.</p>
-</div>
-<p>After installing the client, see <a href="./running.html">"Running the client"</a> for instructions on how to use it to run L1 and/or L2 networks.</p>
+<p>Then visit http://localhost:8000/ on your browser</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../getting-started/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../ethrex_replay/ethrex_replay.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../getting-started/running.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../CONTRIBUTING_DOCS.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -347,11 +295,11 @@ and/or RISC0 provers. <code>gpu</code> feature is also available for CUDA suppor
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../getting-started/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../ethrex_replay/ethrex_replay.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../getting-started/running.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../CONTRIBUTING_DOCS.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
