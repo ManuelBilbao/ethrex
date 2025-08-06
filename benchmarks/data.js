@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1754435343386,
+  "lastUpdate": 1754490089817,
   "repoUrl": "https://github.com/ManuelBilbao/ethrex",
   "entries": {
     "Benchmark": [
@@ -239,6 +239,36 @@ window.BENCHMARK_DATA = {
             "name": "Block import/Block import ERC20 transfers",
             "value": 159673534333,
             "range": "± 235517422",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "manuel.bilbao@lambdaclass.com",
+            "name": "Manuel Iñaki Bilbao",
+            "username": "ManuelBilbao"
+          },
+          "committer": {
+            "email": "manuel.bilbao@lambdaclass.com",
+            "name": "Manuel Iñaki Bilbao",
+            "username": "ManuelBilbao"
+          },
+          "distinct": true,
+          "id": "cee48ae2752ebc7c746c021941f939c7b9b1dd8c",
+          "message": "Remove compiler flags from MacOS build",
+          "timestamp": "2025-08-06T10:46:03-03:00",
+          "tree_id": "cfa9f13d22a301e6b83b24d8ac01566525433412",
+          "url": "https://github.com/ManuelBilbao/ethrex/commit/cee48ae2752ebc7c746c021941f939c7b9b1dd8c"
+        },
+        "date": 1754490087903,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "Block import/Block import ERC20 transfers",
+            "value": 163027167224,
+            "range": "± 553640912",
             "unit": "ns/iter"
           }
         ]
