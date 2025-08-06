@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1754497810950,
+  "lastUpdate": 1754502237819,
   "repoUrl": "https://github.com/ManuelBilbao/ethrex",
   "entries": {
     "Benchmark": [
@@ -359,6 +359,36 @@ window.BENCHMARK_DATA = {
             "name": "Block import/Block import ERC20 transfers",
             "value": 162676476291,
             "range": "± 335542652",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "manuel.bilbao@lambdaclass.com",
+            "name": "Manuel Iñaki Bilbao",
+            "username": "ManuelBilbao"
+          },
+          "committer": {
+            "email": "manuel.bilbao@lambdaclass.com",
+            "name": "Manuel Iñaki Bilbao",
+            "username": "ManuelBilbao"
+          },
+          "distinct": true,
+          "id": "f08b289366588fca0654eba552272ef23a82d1b0",
+          "message": "fix(ci): add token permissions",
+          "timestamp": "2025-08-06T14:08:56-03:00",
+          "tree_id": "f9efa568d20b4de00fb2b3722a16245f7c90c41e",
+          "url": "https://github.com/ManuelBilbao/ethrex/commit/f08b289366588fca0654eba552272ef23a82d1b0"
+        },
+        "date": 1754502235935,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "Block import/Block import ERC20 transfers",
+            "value": 161252257134,
+            "range": "± 127124002",
             "unit": "ns/iter"
           }
         ]
