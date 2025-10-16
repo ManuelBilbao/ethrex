@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Docker image - Ethrex</title>
+        <title>Deploy a contract - Ethrex</title>
 
 
         <!-- Custom HTML head -->
@@ -237,76 +237,33 @@
 }
 
 </style>
-<h1 id="installing-ethrex-docker"><a class="header" href="#installing-ethrex-docker">Installing ethrex (docker)</a></h1>
-<p>Run Ethrex easily using Docker containers. This guide covers pulling and running official images.</p>
-<h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
+<h1 id="deploy-a-contract-to-l2"><a class="header" href="#deploy-a-contract-to-l2">Deploy a Contract to L2</a></h1>
+<p>You can deploy smart contracts to your L2 using <a href="https://github.com/lambdaclass/rex"><code>rex</code></a>, a simple CLI tool for interacting with Ethereum-compatible networks.</p>
+<h2 id="1-generate-the-contract-bytecode"><a class="header" href="#1-generate-the-contract-bytecode">1. Generate the Contract Bytecode</a></h2>
+<p>First, compile your Solidity contract to get the deployment bytecode. You can use <a href="https://docs.soliditylang.org/en/latest/installing-solidity.html">solc</a> for this:</p>
+<pre><code class="language-sh">solc --bin MyContract.sol -o out/
+</code></pre>
+<p>The bytecode will be in out/MyContract.bin</p>
+<h2 id="2-deploy-with-rex"><a class="header" href="#2-deploy-with-rex">2. Deploy with rex</a></h2>
+<p>Use the following command to deploy your contract:</p>
+<pre><code class="language-sh">rex deploy --rpc-url http://localhost:1729 &lt;BYTECODE&gt; 0 &lt;PRIVATE_KEY&gt;
+</code></pre>
 <ul>
-<li><a href="https://www.docker.com/get-started/">Docker</a> installed and running</li>
+<li>Replace <code>&lt;BYTECODE&gt;</code> with the hex string from your compiled contract (e.g., contents of <code>MyContract.bin</code>)</li>
+<li>Replace <code>&lt;PRIVATE_KEY&gt;</code> with your wallet's private key. It must have funds in L2</li>
+<li>Adjust the <code>--rpc-url</code> if your L2 node is running elsewhere</li>
 </ul>
-<h2 id="pulling-the-docker-image"><a class="header" href="#pulling-the-docker-image">Pulling the Docker Image</a></h2>
-<p><strong>Latest stable release:</strong></p>
-<pre><code class="language-sh">docker pull ghcr.io/lambdaclass/ethrex:latest
-</code></pre>
-<p><strong>Latest development build:</strong></p>
-<pre><code class="language-sh">docker pull ghcr.io/lambdaclass/ethrex:main
-</code></pre>
-<p><strong>Specific version:</strong></p>
-<pre><code class="language-sh">docker pull ghcr.io/lambdaclass/ethrex:&lt;version-tag&gt;
-</code></pre>
-<p>Find available tags in the <a href="https://github.com/lambdaclass/ethrex/tags" target="_blank">GitHub repo</a>.</p>
-<hr />
-<h2 id="running-the-docker-image"><a class="header" href="#running-the-docker-image">Running the Docker Image</a></h2>
-<h3 id="check-the-image"><a class="header" href="#check-the-image">Check the Image</a></h3>
-<p>Verify the image is working:</p>
-<pre><code class="language-sh">docker run --rm ghcr.io/lambdaclass/ethrex --version
-</code></pre>
-<h3 id="start-an-ethrex-node"><a class="header" href="#start-an-ethrex-node">Start an ethrex Node</a></h3>
-<p>Run the following command to start a node in the background:</p>
-<pre><code class="language-sh">docker run \
-    --rm \
-    -d \
-    -v ethrex:/root/.local/share/ethrex \
-    -p 8545:8545 \
-    -p 8551:8551 \
-    -p 30303:30303 \
-    -p 30303:30303/udp \
-    -p 9090:9090 \
-    --name ethrex \
-    ghcr.io/lambdaclass/ethrex \
-    --authrpc.addr 0.0.0.0
-</code></pre>
-<p><strong>What this does:</strong></p>
-<ul>
-<li>Starts a container named <code>ethrex</code></li>
-<li>Publishes ports:
-<ul>
-<li><code>8545</code>: JSON-RPC server (TCP)</li>
-<li><code>8551</code>: Auth JSON-RPC server (TCP)</li>
-<li><code>30303</code>: P2P networking (TCP/UDP)</li>
-<li><code>9090</code>: Metrics (TCP)</li>
-</ul>
-</li>
-<li>Mounts the Docker volume <code>ethrex</code> to persist blockchain data</li>
-</ul>
-<p><strong>Tip:</strong> You can add more Ethrex CLI arguments at the end of the command as needed.</p>
-<hr />
-<h2 id="managing-the-container"><a class="header" href="#managing-the-container">Managing the Container</a></h2>
-<p><strong>View logs:</strong></p>
-<pre><code class="language-sh">docker logs -f ethrex
-</code></pre>
-<p><strong>Stop the node:</strong></p>
-<pre><code class="language-sh">docker stop ethrex
-</code></pre>
+<p>For more details and advanced usage, see the <a href="https://github.com/lambdaclass/rex">rex repository</a>.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../../getting-started/installation/package_manager.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../../l2/interacting/wallet.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../../getting-started/installation/building_from_source.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../../l2/fundamentals/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -316,11 +273,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../../getting-started/installation/package_manager.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../../l2/interacting/wallet.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../../getting-started/installation/building_from_source.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../../l2/fundamentals/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

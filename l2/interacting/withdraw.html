@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Docker image - Ethrex</title>
+        <title>Withdraw assets - Ethrex</title>
 
 
         <!-- Custom HTML head -->
@@ -237,76 +237,57 @@
 }
 
 </style>
-<h1 id="installing-ethrex-docker"><a class="header" href="#installing-ethrex-docker">Installing ethrex (docker)</a></h1>
-<p>Run Ethrex easily using Docker containers. This guide covers pulling and running official images.</p>
-<h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
+<h1 id="withdraw-assets-from-the-l2"><a class="header" href="#withdraw-assets-from-the-l2">Withdraw assets from the L2</a></h1>
+<p>This section explains how to withdraw funds from the L2 through the native bridge.</p>
+<h2 id="prerequisites-for-l2-withdrawal"><a class="header" href="#prerequisites-for-l2-withdrawal">Prerequisites for L2 withdrawal</a></h2>
 <ul>
-<li><a href="https://www.docker.com/get-started/">Docker</a> installed and running</li>
-</ul>
-<h2 id="pulling-the-docker-image"><a class="header" href="#pulling-the-docker-image">Pulling the Docker Image</a></h2>
-<p><strong>Latest stable release:</strong></p>
-<pre><code class="language-sh">docker pull ghcr.io/lambdaclass/ethrex:latest
-</code></pre>
-<p><strong>Latest development build:</strong></p>
-<pre><code class="language-sh">docker pull ghcr.io/lambdaclass/ethrex:main
-</code></pre>
-<p><strong>Specific version:</strong></p>
-<pre><code class="language-sh">docker pull ghcr.io/lambdaclass/ethrex:&lt;version-tag&gt;
-</code></pre>
-<p>Find available tags in the <a href="https://github.com/lambdaclass/ethrex/tags" target="_blank">GitHub repo</a>.</p>
-<hr />
-<h2 id="running-the-docker-image"><a class="header" href="#running-the-docker-image">Running the Docker Image</a></h2>
-<h3 id="check-the-image"><a class="header" href="#check-the-image">Check the Image</a></h3>
-<p>Verify the image is working:</p>
-<pre><code class="language-sh">docker run --rm ghcr.io/lambdaclass/ethrex --version
-</code></pre>
-<h3 id="start-an-ethrex-node"><a class="header" href="#start-an-ethrex-node">Start an ethrex Node</a></h3>
-<p>Run the following command to start a node in the background:</p>
-<pre><code class="language-sh">docker run \
-    --rm \
-    -d \
-    -v ethrex:/root/.local/share/ethrex \
-    -p 8545:8545 \
-    -p 8551:8551 \
-    -p 30303:30303 \
-    -p 30303:30303/udp \
-    -p 9090:9090 \
-    --name ethrex \
-    ghcr.io/lambdaclass/ethrex \
-    --authrpc.addr 0.0.0.0
-</code></pre>
-<p><strong>What this does:</strong></p>
+<li>An L2 account with sufficient ETH balance, for developing purpose you can use:
 <ul>
-<li>Starts a container named <code>ethrex</code></li>
-<li>Publishes ports:
-<ul>
-<li><code>8545</code>: JSON-RPC server (TCP)</li>
-<li><code>8551</code>: Auth JSON-RPC server (TCP)</li>
-<li><code>30303</code>: P2P networking (TCP/UDP)</li>
-<li><code>9090</code>: Metrics (TCP)</li>
+<li>Address: <code>0x8943545177806ed17b9f23f0a21ee5948ecaa776</code></li>
+<li>Private Key: <code>0xbcdf20249abf0ed6d944c0288fad489e33f66b3960d9e6229c1cd214ed3bbe31</code></li>
 </ul>
 </li>
-<li>Mounts the Docker volume <code>ethrex</code> to persist blockchain data</li>
+<li>The address of the deployed <code>CommonBridge</code> L2 contract (note here that we are calling the L2 contract instead of the L1 as in the deposit case). If not specified, You can use:
+<ul>
+<li><code>CommonBridge</code> L2: <code>0x000000000000000000000000000000000000ffff</code></li>
 </ul>
-<p><strong>Tip:</strong> You can add more Ethrex CLI arguments at the end of the command as needed.</p>
-<hr />
-<h2 id="managing-the-container"><a class="header" href="#managing-the-container">Managing the Container</a></h2>
-<p><strong>View logs:</strong></p>
-<pre><code class="language-sh">docker logs -f ethrex
+</li>
+<li>An Ethereum utility tool like <a href="https://github.com/lambdaclass/rex">Rex</a>.</li>
+</ul>
+<h2 id="making-a-withdrawal"><a class="header" href="#making-a-withdrawal">Making a withdrawal</a></h2>
+<p>Using Rex, we simply run the <code>rex l2 withdraw</code> command, which uses the default <code>CommonBridge</code> address.</p>
+<pre><code class="language-sh"># Format: rex l2 withdraw &lt;AMOUNT&gt; &lt;PRIVATE_KEY&gt; [RPC_URL]
+rex l2 withdraw 5000 0xbcdf20249abf0ed6d944c0288fad489e33f66b3960d9e6229c1cd214ed3bbe31
 </code></pre>
-<p><strong>Stop the node:</strong></p>
-<pre><code class="language-sh">docker stop ethrex
+<p>If the withdrawal is successful, the hash will be printed like this:</p>
+<pre><code class="language-text">Withdrawal sent: &lt;L2_WITHDRAWAL_TX_HASH&gt;
+...
+</code></pre>
+<h2 id="claiming-the-withdrawal"><a class="header" href="#claiming-the-withdrawal">Claiming the withdrawal</a></h2>
+<p>After making a withdrawal, it has to be claimed in the L1, through the L1 <code>CommonBridge</code> contract.
+For that, we can use the Rex command <code>rex l2 claim-withdraw</code>, with the tx hash obtained in the previous step.
+But first, it is necessary to wait for the block that includes the withdraw to be verified.</p>
+<!-- TODO: how can we check the withdrawal was verified? -->
+<pre><code class="language-sh"># Format: rex l2 claim-withdraw &lt;L2_WITHDRAWAL_TX_HASH&gt; &lt;PRIVATE_KEY&gt; &lt;BRIDGE_ADDRESS&gt; [L1_RPC_URL] [RPC_URL]
+rex l2 claim-withdraw &lt;L2_WITHDRAWAL_TX_HASH&gt; 0xbcdf20249abf0ed6d944c0288fad489e33f66b3960d9e6229c1cd214ed3bbe31 0x65dd6dc5df74b7e08e92c910122f91d7b2d5184f
+</code></pre>
+<h2 id="verifying-the-withdrawal"><a class="header" href="#verifying-the-withdrawal">Verifying the withdrawal</a></h2>
+<p>Once the withdrawal is made you can verify the balance has decreased in the L2 with:</p>
+<pre><code class="language-sh">rex l2 balance 0x8943545177806ed17b9f23f0a21ee5948ecaa776
+</code></pre>
+<p>And also increased in the L1:</p>
+<pre><code class="language-sh">rex balance 0x8943545177806ed17b9f23f0a21ee5948ecaa776
 </code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../../getting-started/installation/package_manager.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../../l2/interacting/deposit.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../../getting-started/installation/building_from_source.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../../l2/interacting/wallet.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -316,11 +297,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../../getting-started/installation/package_manager.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../../l2/interacting/deposit.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../../getting-started/installation/building_from_source.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../../l2/interacting/wallet.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
