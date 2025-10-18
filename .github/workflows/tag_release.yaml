@@ -11,172 +11,172 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: manuelbilbao/ethrex
 
 jobs:
-  build-ethrex:
-    strategy:
-      matrix:
-        platform:
-          - ubuntu-22.04
-          - ubuntu-24.04-arm
-          - macos-latest
-        stack:
-          - l1
-          - l2
-          - l2_gpu
-        exclude:
-          - platform: macos-latest
-            stack: l2_gpu
-        include:
-          - platform: ubuntu-22.04
-            os: linux
-            arch: x86_64
-            cpu_flags: RUSTFLAGS='-C target-cpu=x86-64-v2'
-          - platform: ubuntu-24.04-arm
-            os: linux
-            arch: aarch64
-          - platform: macos-latest
-            os: macos
-            arch: aarch64
-          - platform: macos-latest
-            stack: l2
-            features: l2,l2-sql
-          - platform: ubuntu-22.04
-            stack: l2
-            features: l2,l2-sql,sp1,risc0
-          - platform: ubuntu-22.04
-            stack: l2_gpu
-            features: l2,l2-sql,sp1,risc0,gpu
-          - platform: ubuntu-24.04-arm
-            stack: l2
-            features: l2,l2-sql,sp1
-          - platform: ubuntu-24.04-arm
-            stack: l2_gpu
-            features: l2,l2-sql,sp1,gpu
-          - stack: l2_gpu
-            gpu_flags: NVCC_PREPEND_FLAGS='-arch=sm_70'
-            l2_suffix: "-l2"
-            gpu_suffix: "-gpu"
-          - stack: l2
-            l2_suffix: "-l2"
-    runs-on: ${{ matrix.platform }}
-    steps:
-      - name: Free Disk Space (Ubuntu)
-        if: ${{ matrix.os == 'linux' }}
-        uses: jlumbroso/free-disk-space@v1.3.1
-        with:
-          tool-cache: false
-          large-packages: false
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Rust Environment
-        uses: ./.github/actions/setup-rust
-
-      - name: Install SP1 (only Linux)
-        if: ${{ matrix.os == 'linux' }}
-        env:
-          SHELL: /bin/bash
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          curl -L https://sp1up.succinct.xyz | bash
-          ~/.sp1/bin/sp1up --version 5.0.8
-
-      - name: Set up QEMU (only Linux ARM)
-        if: ${{ matrix.platform == 'ubuntu-24.04-arm' }}
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: amd64
-
-      - name: Install RISC0 (only Linux x86)
-        if: ${{ matrix.platform == 'ubuntu-22.04' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          curl -L https://risczero.com/install | bash
-          ~/.risc0/bin/rzup install cargo-risczero 3.0.3
-          ~/.risc0/bin/rzup install risc0-groth16
-          ~/.risc0/bin/rzup install rust
-
-      - name: Install CUDA (only Linux x86 GPU)
-        uses: Jimver/cuda-toolkit@v0.2.24
-        if: ${{ matrix.platform == 'ubuntu-22.04' && matrix.stack == 'l2_gpu' }}
-        id: cuda-toolkit
-        with:
-          cuda: "12.9.0"
-          method: "network"
-          sub-packages: '["nvcc"]'
-
-      - name: Install solc
-        if: ${{ matrix.platform != 'ubuntu-24.04-arm' }}
-        uses: lambdaclass/get-solc@master
-        with:
-          version: v0.8.29
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v3
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install solc (Linux ARM)
-        if: ${{ matrix.platform == 'ubuntu-24.04-arm' }}
-        run: |
-          sudo curl -L -o /usr/local/bin/solc https://github.com/nikitastupin/solc/raw/refs/heads/main/linux/aarch64/solc-v0.8.29
-          sudo chmod +x /usr/local/bin/solc
-
-      - name: Build ethrex
-        run: |
-          COMPILE_CONTRACTS=true ${{ matrix.cpu_flags }} ${{ matrix.gpu_flags }} cargo build --release --features "${{ matrix.features }}" --bin ethrex
-          chmod +x target/release/ethrex
-          mv target/release/ethrex ethrex${{ matrix.l2_suffix }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.gpu_suffix }}
-
-      - name: Copy verification keys
-        if: ${{ matrix.platform == 'ubuntu-22.04' && matrix.stack == 'l2_gpu' }} # Run only once
-        run: |
-          mkdir -p ./verification_keys
-          mv crates/l2/prover/src/guest_program/src/risc0/out/riscv32im-risc0-vk verification_keys/ethrex-riscv32im-risc0-vk
-          mv crates/l2/prover/src/guest_program/src/sp1/out/riscv32im-succinct-zkvm-vk verification_keys/ethrex-riscv32im-succinct-zkvm-vk
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ethrex${{ matrix.l2_suffix }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.gpu_suffix }}
-          path: ethrex${{ matrix.l2_suffix }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.gpu_suffix }}
-
-      - name: Upload verification keys
-        if: ${{ matrix.platform == 'ubuntu-22.04' && matrix.stack == 'l2_gpu' }} # Run only once
-        uses: actions/upload-artifact@v4
-        with:
-          name: verification_keys
-          path: verification_keys/
-
-  package-contracts:
-    needs:
-      - build-ethrex
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download verification keys artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: verification_keys
-          path: crates/l2/contracts/src/
-
-      - name: Archive contracts
-        run: |
-          cd crates/l2/contracts/src/
-          tar -czvf ../../../../ethrex-contracts.tar.gz .
-
-      - name: Upload contracts artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ethrex-contracts.tar.gz
-          path: ethrex-contracts.tar.gz
+#   build-ethrex:
+#     strategy:
+#       matrix:
+#         platform:
+#           - ubuntu-22.04
+#           - ubuntu-24.04-arm
+#           - macos-latest
+#         stack:
+#           - l1
+#           - l2
+#           - l2_gpu
+#         exclude:
+#           - platform: macos-latest
+#             stack: l2_gpu
+#         include:
+#           - platform: ubuntu-22.04
+#             os: linux
+#             arch: x86_64
+#             cpu_flags: RUSTFLAGS='-C target-cpu=x86-64-v2'
+#           - platform: ubuntu-24.04-arm
+#             os: linux
+#             arch: aarch64
+#           - platform: macos-latest
+#             os: macos
+#             arch: aarch64
+#           - platform: macos-latest
+#             stack: l2
+#             features: l2,l2-sql
+#           - platform: ubuntu-22.04
+#             stack: l2
+#             features: l2,l2-sql,sp1,risc0
+#           - platform: ubuntu-22.04
+#             stack: l2_gpu
+#             features: l2,l2-sql,sp1,risc0,gpu
+#           - platform: ubuntu-24.04-arm
+#             stack: l2
+#             features: l2,l2-sql,sp1
+#           - platform: ubuntu-24.04-arm
+#             stack: l2_gpu
+#             features: l2,l2-sql,sp1,gpu
+#           - stack: l2_gpu
+#             gpu_flags: NVCC_PREPEND_FLAGS='-arch=sm_70'
+#             l2_suffix: "-l2"
+#             gpu_suffix: "-gpu"
+#           - stack: l2
+#             l2_suffix: "-l2"
+#     runs-on: ${{ matrix.platform }}
+#     steps:
+#       - name: Free Disk Space (Ubuntu)
+#         if: ${{ matrix.os == 'linux' }}
+#         uses: jlumbroso/free-disk-space@v1.3.1
+#         with:
+#           tool-cache: false
+#           large-packages: false
+# 
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+# 
+#       - name: Setup Rust Environment
+#         uses: ./.github/actions/setup-rust
+# 
+#       - name: Install SP1 (only Linux)
+#         if: ${{ matrix.os == 'linux' }}
+#         env:
+#           SHELL: /bin/bash
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         run: |
+#           curl -L https://sp1up.succinct.xyz | bash
+#           ~/.sp1/bin/sp1up --version 5.0.8
+# 
+#       - name: Set up QEMU (only Linux ARM)
+#         if: ${{ matrix.platform == 'ubuntu-24.04-arm' }}
+#         uses: docker/setup-qemu-action@v3
+#         with:
+#           platforms: amd64
+# 
+#       - name: Install RISC0 (only Linux x86)
+#         if: ${{ matrix.platform == 'ubuntu-22.04' }}
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         run: |
+#           curl -L https://risczero.com/install | bash
+#           ~/.risc0/bin/rzup install cargo-risczero 3.0.3
+#           ~/.risc0/bin/rzup install risc0-groth16
+#           ~/.risc0/bin/rzup install rust
+# 
+#       - name: Install CUDA (only Linux x86 GPU)
+#         uses: Jimver/cuda-toolkit@v0.2.24
+#         if: ${{ matrix.platform == 'ubuntu-22.04' && matrix.stack == 'l2_gpu' }}
+#         id: cuda-toolkit
+#         with:
+#           cuda: "12.9.0"
+#           method: "network"
+#           sub-packages: '["nvcc"]'
+# 
+#       - name: Install solc
+#         if: ${{ matrix.platform != 'ubuntu-24.04-arm' }}
+#         uses: lambdaclass/get-solc@master
+#         with:
+#           version: v0.8.29
+#           token: ${{ secrets.GITHUB_TOKEN }}
+# 
+#       - name: Install Protoc
+#         uses: arduino/setup-protoc@v3
+#         with:
+#           repo-token: ${{ secrets.GITHUB_TOKEN }}
+# 
+#       - name: Install solc (Linux ARM)
+#         if: ${{ matrix.platform == 'ubuntu-24.04-arm' }}
+#         run: |
+#           sudo curl -L -o /usr/local/bin/solc https://github.com/nikitastupin/solc/raw/refs/heads/main/linux/aarch64/solc-v0.8.29
+#           sudo chmod +x /usr/local/bin/solc
+# 
+#       - name: Build ethrex
+#         run: |
+#           COMPILE_CONTRACTS=true ${{ matrix.cpu_flags }} ${{ matrix.gpu_flags }} cargo build --release --features "${{ matrix.features }}" --bin ethrex
+#           chmod +x target/release/ethrex
+#           mv target/release/ethrex ethrex${{ matrix.l2_suffix }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.gpu_suffix }}
+# 
+#       - name: Copy verification keys
+#         if: ${{ matrix.platform == 'ubuntu-22.04' && matrix.stack == 'l2_gpu' }} # Run only once
+#         run: |
+#           mkdir -p ./verification_keys
+#           mv crates/l2/prover/src/guest_program/src/risc0/out/riscv32im-risc0-vk verification_keys/ethrex-riscv32im-risc0-vk
+#           mv crates/l2/prover/src/guest_program/src/sp1/out/riscv32im-succinct-zkvm-vk verification_keys/ethrex-riscv32im-succinct-zkvm-vk
+# 
+#       - name: Upload artifact
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: ethrex${{ matrix.l2_suffix }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.gpu_suffix }}
+#           path: ethrex${{ matrix.l2_suffix }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.gpu_suffix }}
+# 
+#       - name: Upload verification keys
+#         if: ${{ matrix.platform == 'ubuntu-22.04' && matrix.stack == 'l2_gpu' }} # Run only once
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: verification_keys
+#           path: verification_keys/
+# 
+#   package-contracts:
+#     needs:
+#       - build-ethrex
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+# 
+#       - name: Download verification keys artifacts
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: verification_keys
+#           path: crates/l2/contracts/src/
+# 
+#       - name: Archive contracts
+#         run: |
+#           cd crates/l2/contracts/src/
+#           tar -czvf ../../../../ethrex-contracts.tar.gz .
+# 
+#       - name: Upload contracts artifact
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: ethrex-contracts.tar.gz
+#           path: ethrex-contracts.tar.gz
 
   build-docker:
     name: "Build and publish ethrex docker image"
@@ -223,9 +223,9 @@ jobs:
   # Creates a release on GitHub with the binaries
   finalize-release:
     needs:
-      - build-ethrex
+      # - build-ethrex
       - build-docker
-      - package-contracts
+      # - package-contracts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -233,11 +233,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ./bin
-          pattern: "ethrex*"
+      # - name: Download artifacts
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     path: ./bin
+      #     pattern: "ethrex*"
 
       - name: Get previous tag
         run: |
