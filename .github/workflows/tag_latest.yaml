@@ -1,4 +1,4 @@
-name: Ethrex Release
+name: Ethrex Latest Release
 
 on:
   release:
