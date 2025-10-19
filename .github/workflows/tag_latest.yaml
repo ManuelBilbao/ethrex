@@ -28,7 +28,10 @@ jobs:
     steps:
       - name: Test
         run: |
-          echo ${{ github.event.changes }}
+          echo ${{ github.event.changes.tag_name }}
+          echo ${{ github.event.changes.tag_name.from }}
+          echo ${{ github.event.changes.make_latest }}
+          echo ${{ github.event.changes.make_latest.to }}
 
       - name: Get new tag
         run: echo "TAG_VERSION=$(echo ${{ github.event.release.tag_name.from }} | cut -d- -f1 | tr -d v)" >> $GITHUB_ENV
