@@ -16,7 +16,7 @@ jobs:
   retag_docker_images:
     name: "Tag latest Docker images"
     runs-on: ubuntu-latest
-    if: ${{ github.event.changes.make_latest.to }}
+    # if: ${{ github.event.changes.make_latest.to }}
 
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     permissions:
@@ -24,6 +24,10 @@ jobs:
       id-token: write
 
     steps:
+      - name: Test
+        run: |
+          echo ${{ github.event.changes }}
+
       - name: Get new tag
         run: echo "TAG_VERSION=$(echo ${{ github.event.release.tag_name.from }} | cut -d- -f1 | tr -d v)" >> $GITHUB_ENV
 
