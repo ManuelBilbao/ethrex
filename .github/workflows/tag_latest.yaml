@@ -16,7 +16,7 @@ jobs:
   retag_docker_images:
     name: "Tag latest Docker images"
     runs-on: ubuntu-latest
-    if: ${{ github.event.changes.make_latest.to == true }}
+    if: ${{ github.event.changes.make_latest.to }}
 
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     permissions:
