@@ -28,11 +28,7 @@ jobs:
     steps:
       - name: Test
         run: |
-          echo Old tag: ${{ github.event.changes.tag_name }}
-          echo Old tag from: ${{ github.event.changes.tag_name.from }}
-          echo New tag: ${{ github.event.release.tag_name }}
-          echo ${{ github.event.changes.make_latest }}
-          echo ${{ github.event.changes.make_latest.to }}
+          echo "${{ toJson(github.event) }}"
 
       - name: Get new tag
         run: echo "TAG_VERSION=$(echo ${{ github.event.release.tag_name.from }} | cut -d- -f1 | tr -d v)" >> $GITHUB_ENV
