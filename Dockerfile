@@ -67,7 +67,8 @@ WORKDIR /usr/local/bin
 # 
 # COPY cmd/ethrex/networks ./cmd/ethrex/networks
 # COPY --from=builder /ethrex/target/release/ethrex .
-
+ARG BUILD_FLAGS=""
+RUN echo $BUILD_FLAGS >> /flags
 # Common ports:
 # -  8545: RPC
 # -  8551: EngineAPI
