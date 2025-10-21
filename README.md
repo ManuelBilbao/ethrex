@@ -51,7 +51,7 @@ You can find our current and planned features in our roadmap page.
 
 ## 📖 Documentation
 
-Full documentation is available in the [`docs/`](./docs/) directory. Please refer to it for setup, usage, and development details.
+Full documentation is in the [`docs/`](./docs/) directory. Please refer to it for setup, usage, and development details.
 For better viewing, we have it hosted in [docs.ethrex.xyz](https://docs.ethrex.xyz/).
 This includes both [L1](https://docs.ethrex.xyz/l1/index.html) and [L2](https://docs.ethrex.xyz/l2/index.html) documentation.
 
