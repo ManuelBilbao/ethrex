@@ -58,7 +58,7 @@ This includes both [L1](https://docs.ethrex.xyz/l1/index.html) and [L2](https://
 
 ## 📚 References and acknowledgements
 
-The following links, repos, companies and projects have been important in the development of this repo, we have learned a lot from them and want to thank and acknowledge them.
+The following links, repos, companies and  have been important in the development of this repo, we have learned a lot from them and want to thank and acknowledge them.
 
 - [Ethereum](https://ethereum.org/en/)
 - [Starkware](https://starkware.co/)
