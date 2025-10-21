@@ -31,7 +31,7 @@ Read more about our engineering philosophy [in this post of our blog](https://bl
 
 ## Design Principles
 
-- Ensure effortless setup and execution across all target environments.
+- Ensure effortless setup and execution across all environments.
 - Be vertically integrated. Have the minimal amount of dependencies.
 - Be structured in a way that makes it easy to build on top of it, i.e rollups, vms, etc.
 - Have a simple type system. Avoid having generics leaking all over the codebase.
