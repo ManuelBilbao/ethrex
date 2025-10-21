@@ -22,6 +22,7 @@ jobs:
       - name: Get latest release tag from GH API
         run: |
           tag=$(curl -s https://api.github.com/repos/manuelbilbao/ethrex/releases/latest | jq -r .tag_name)
+          echo "Latest release tag: $tag"
           echo "latest_tag=$tag" >> $GITHUB_OUTPUT
 
   retag_docker_images:
