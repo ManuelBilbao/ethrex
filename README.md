@@ -1,6 +1,6 @@
 # ethrex
 
- Minimalist, stable, modular and fast implementation of the Ethereum protocol in Rust.
+Minimalist, stable, modular and fast implementation of the Ethereum protocol in Rust.
 
 [![Telegram Chat][tg-badge]][tg-url]
 [![license](https://img.shields.io/github/license/lambdaclass/ethrex)](/LICENSE)
