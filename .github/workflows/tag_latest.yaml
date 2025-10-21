@@ -17,11 +17,14 @@ jobs:
   get_latest_release:
     name: "Get latest release tag"
     runs-on: ubuntu-latest
+    outputs:
+      latest_tag: ${{ steps.get_latest_release.outputs.latest_tag }}
 
     steps:
       - name: Get latest release tag from GH API
+        id: get_latest_release
         run: |
-          tag=$(curl -s https://api.github.com/repos/manuelbilbao/ethrex/releases/latest | jq -r .tag_name)
+          tag=$(curl -s https://api.github.com/repos/${{ github.IMAGE_NAME }}/releases/latest | jq -r .tag_name)
           echo "Latest release tag: $tag"
           echo "latest_tag=$tag" >> $GITHUB_OUTPUT
 
@@ -52,15 +55,15 @@ jobs:
 
       - name: Download Docker images
         run: |
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name.from }}
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name.from }}-l2
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.changes.tag_name.from }}
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.changes.tag_name.from }}-l2
 
       - name: Retag Docker images
         run: |
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name.from }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }}
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name.from }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name.from }}-l2 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:l2
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name.from }}-l2 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }}-l2
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.changes.tag_name.from }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }}
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.changes.tag_name.from }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.changes.tag_name.from }}-l2 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:l2
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.changes.tag_name.from }}-l2 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }}-l2
 
       - name: Push retagged Docker images
         run: |
