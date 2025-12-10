@@ -248,26 +248,34 @@
 <li><code>release/v3.2.0</code></li>
 </ul>
 <h2 id="2nd---bump-version"><a class="header" href="#2nd---bump-version">2nd - Bump version</a></h2>
-<p>In the release branch, update the <code>[workspace.package]</code> version to <code>X.Y.Z</code> in the root <code>Cargo.toml</code>, and push the change to the branch.</p>
-<p>An example can be found here:</p>
-<p>https://github.com/lambdaclass/ethrex/pull/4881/files#diff-2e9d962a08321605940b5a657135052fbcef87b5e360662bb527c96d9a615542</p>
-<p>There are currently three <code>Cargo.lock</code> files that will be affected. Make sure you check them:</p>
+<p>The version must be updated to <code>X.Y.Z</code> in the release branch. There are multiple <code>Cargo.toml</code> and <code>Cargo.lock</code> files that need to be updated.</p>
+<p>First, we need to update the version of the workspace package. You can find it in the <code>Cargo.toml</code> file in the root directory, under the <code>[workspace.package]</code> section.</p>
+<p>Then, we need to update three more <code>Cargo.toml</code> files that are not part of the workspace but fulfill the role of packages in the monorepo. These are located in the following paths:</p>
 <ul>
-<li>root <code>Cargo.lock</code></li>
-<li><code>sp1/Cargo.lock</code></li>
-<li><code>risc0/Cargo.lock</code></li>
+<li><code>crates/l2/prover/src/guest_program/src/sp1/Cargo.toml</code></li>
+<li><code>crates/l2/prover/src/guest_program/src/risc0/Cargo.toml</code></li>
+<li><code>crates/l2/tee/quote-gen/Cargo.toml</code></li>
 </ul>
-<h2 id="3rd---create--push-tag"><a class="header" href="#3rd---create--push-tag">3rd - Create &amp; Push Tag</a></h2>
-<p>Create a tag with a format <code>vX.Y.Z[-custom]</code> where <code>X.Y.Z</code> is the semantic version and <code>-custom</code> is an optional subversion. Example of valid tags:</p>
+<p>After updating the version in the <code>Cargo.toml</code> files, we need to update the <code>Cargo.lock</code> files to reflect the new versions. Run <code>cargo tree</code> in their respective directories:</p>
 <ul>
-<li><code>v0.0.1</code></li>
+<li>In the root directory</li>
+<li><code>crates/l2/prover/src/guest_program/src/sp1</code></li>
+<li><code>crates/l2/prover/src/guest_program/src/risc0</code></li>
+<li><code>crates/l2/tee/quote-gen</code></li>
+</ul>
+<p>Then, go to the <code>CLI.md</code> file located in <code>docs/</code> and update the version of the <code>--builder.extra-data</code> flag default value to match the new version (for both ethrex and ethrex l2 sections).</p>
+<p>Finally, stage and commit the changes to the release branch.</p>
+<p>An example of a PR that bumps the version can be found <a href="https://github.com/lambdaclass/ethrex/pull/4881/files#diff-2e9d962a08321605940b5a657135052fbcef87b5e360662bb527c96d9a615542">here</a>.</p>
+<h2 id="3rd---create--push-tag"><a class="header" href="#3rd---create--push-tag">3rd - Create &amp; Push Tag</a></h2>
+<p>Create a tag with a format <code>vX.Y.Z-rc.W</code> where <code>X.Y.Z</code> is the semantic version and <code>W</code> is a release candidate version. Other names for subversions are also accepted. Example of valid tags:</p>
+<ul>
 <li><code>v0.1.3-rc.1</code></li>
 <li><code>v0.0.2-alpha</code></li>
 </ul>
 <pre><code class="language-bash">git tag &lt;release_version&gt;
-git push --tags
+git push origin &lt;release_version&gt;
 </code></pre>
-<p>After pushing the tag, a CI job will compile the binaries for different architectures and create a release with the version specified in the tag name. Along with the binaries, a tar file is uploaded with the contracts and the verification keys. The following binaries are built:</p>
+<p>After pushing the tag, a CI job will compile the binaries for different architectures and create a pre-release with the version specified in the tag name. Along with the binaries, a tar file is uploaded with the contracts and the verification keys. The following binaries are built:</p>
 <div class="table-wrapper"><table><thead><tr><th>name</th><th>L2 stack</th><th>Provers</th><th>CUDA support</th></tr></thead><tbody>
 <tr><td>ethrex-linux-x86-64</td><td>❌</td><td>-</td><td>-</td></tr>
 <tr><td>ethrex-linux-aarch64</td><td>❌</td><td>-</td><td>-</td></tr>
@@ -279,11 +287,28 @@ git push --tags
 <tr><td>ethrex-l2-macos-aarch64</td><td>✅</td><td>Exec</td><td>❌</td></tr>
 </tbody></table>
 </div>
-<p>A changelog will be generated based on commit names (using conventional commits) from the last tag.</p>
-<h2 id="4th---update-homebrew"><a class="header" href="#4th---update-homebrew">4th - Update Homebrew</a></h2>
+<p>Also, two docker images are built and pushed to the Github Container registry:</p>
+<ul>
+<li><code>ghcr.io/lambdaclass/ethrex:X.Y.Z-rc.W</code></li>
+<li><code>ghcr.io/lambdaclass/ethrex:X.Y.Z-rc.W-l2</code></li>
+</ul>
+<p>A changelog will be generated based on commit names (using conventional commits) from the last stable tag.</p>
+<h2 id="4th---test--publish-release"><a class="header" href="#4th---test--publish-release">4th - Test &amp; Publish Release</a></h2>
+<p>When you are sure all the binaries and docker images work as expected, you can proceed to publish the release. To do so, edit the last pre-release with the following changes:</p>
+<ul>
+<li>Change the name to <code>ethrex: vX.Y.Z</code></li>
+<li>Change the tag to a new one <code>vX.Y.Z</code>. <strong>IMPORTANT</strong>: Make sure to select the <code>release/vX.Y.Z</code> branch when changing the tag.</li>
+<li>Set the release as the latest release (you will need to uncheck the pre-release first).</li>
+</ul>
+<p>Once done, the CI will publish new tags for the already compiled docker images:</p>
+<ul>
+<li><code>ghcr.io/lambdaclass/ethrex:X.Y.Z</code>, <code>ghcr.io/lambdaclass/ethrex:latest</code></li>
+<li><code>ghcr.io/lambdaclass/ethrex:X.Y.Z-l2</code>, <code>ghcr.io/lambdaclass/ethrex:l2</code></li>
+</ul>
+<h2 id="5th---update-homebrew"><a class="header" href="#5th---update-homebrew">5th - Update Homebrew</a></h2>
 <p>Disclaimer: We should automate this</p>
 <ol>
-<li>Commit a change in https://github.com/lambdaclass/homebrew-tap/ bumping the ethrex version (like this one  https://github.com/lambdaclass/homebrew-tap/commit/d78a2772ad9c5412e7f84c6210bd85c970fcd0e6).
+<li>Commit a change in https://github.com/lambdaclass/homebrew-tap/ bumping the ethrex version (like <a href="https://github.com/lambdaclass/homebrew-tap/commit/d78a2772ad9c5412e7f84c6210bd85c970fcd0e6">this one</a>).
 <ul>
 <li>
 <p>The first SHA is the hash of the <code>.tar.gz</code> from the release. You can get it by downloading the <code>Source code (tar.gz)</code> from the ethrex release and running</p>
@@ -294,11 +319,11 @@ git push --tags
 <p>For the second one:</p>
 <ul>
 <li>
-<p>First download the <code>ethrex-macos_aarch64</code> binary from the ethrex release</p>
+<p>First download the <code>ethrex-l2-macos-aarch64</code> binary from the ethrex release</p>
 </li>
 <li>
 <p>Give exec permissions to binary</p>
-<pre><code class="language-bash">chmod +x ethrex-macos_aarch64
+<pre><code class="language-bash">chmod +x ethrex-l2-macos-aarch64
 </code></pre>
 </li>
 <li>
@@ -331,13 +356,45 @@ xattr -dr com.apple.quarantine ethrex
 </ul>
 </li>
 <li>Push the commit</li>
-<li>Create a new release with tag <code>v3.0.0</code>
-IMPORTANT: attach the <code>ethrex-3.0.0.arm64_sonoma.bottle.tar.gz</code> to the release</li>
+<li>Create a new release with tag <code>v3.0.0</code>. <strong>IMPORTANT</strong>: attach the <code>ethrex-3.0.0.arm64_sonoma.bottle.tar.gz</code> to the release</li>
 </ol>
-<h2 id="5th---merge-the-release-branch-via-pr"><a class="header" href="#5th---merge-the-release-branch-via-pr">5th - Merge the release branch via PR</a></h2>
+<h2 id="6th---merge-the-release-branch-via-pr"><a class="header" href="#6th---merge-the-release-branch-via-pr">6th - Merge the release branch via PR</a></h2>
 <p>Once the release is verified, <strong>merge the branch via PR</strong>.</p>
 <h2 id="dealing-with-hotfixes"><a class="header" href="#dealing-with-hotfixes">Dealing with hotfixes</a></h2>
 <p>If hotfixes are needed before the final release, commit them to <code>release/vX.Y.Z</code>, push, and create a new pre-release tag. The final tag <code>vX.Y.Z</code> should always point to the exact commit you will merge via PR.</p>
+<h2 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h2>
+<h3 id="failure-on-latest-release-workflow"><a class="header" href="#failure-on-latest-release-workflow">Failure on "latest release" workflow</a></h3>
+<p>If the CI fails when setting a release as latest (step 4), Docker tags <code>latest</code> and <code>l2</code> may not be updated. To manually push that changes, follow these steps:</p>
+<ul>
+<li>Create a new Github Personal Access Token (PAT) from the <a href="https://github.com/settings/tokens/new">settings</a>.</li>
+<li>Check <code>write:packages</code> permission (this will auto-check <code>repo</code> permissions too), give a name and a short expiration time.</li>
+<li>Save the token securely.</li>
+<li>Click on <code>Configure SSO</code> button and authorize LambdaClass organization.</li>
+<li>Log in to Github Container Registry: <code>docker login ghcr.io</code>. Put your Github's username and use the token as your password.</li>
+<li>Pull RC images:</li>
+</ul>
+<pre><code class="language-bash">docker pull --platform linux/amd64 ghcr.io/lambdaclass/ethrex:X.Y.Z-rc.W
+docker pull --platform linux/amd64 ghcr.io/lambdaclass/ethrex:X.Y.Z-rc.W-l2
+</code></pre>
+<ul>
+<li>Retag them:</li>
+</ul>
+<pre><code class="language-bash">docker tag ghcr.io/lambdaclass/ethrex:X.Y.Z-rc.W ghcr.io/lambdaclass/ethrex:X.Y.Z
+docker tag ghcr.io/lambdaclass/ethrex:X.Y.Z-rc.W-l2 ghcr.io/lambdaclass/ethrex:X.Y.Z-l2
+docker tag ghcr.io/lambdaclass/ethrex:X.Y.Z-rc.W ghcr.io/lambdaclass/ethrex:latest
+docker tag ghcr.io/lambdaclass/ethrex:X.Y.Z-rc.W-l2 ghcr.io/lambdaclass/ethrex:l2
+</code></pre>
+<ul>
+<li>Push them:</li>
+</ul>
+<pre><code class="language-bash">docker push ghcr.io/lambdaclass/ethrex:X.Y.Z
+docker push ghcr.io/lambdaclass/ethrex:X.Y.Z-l2
+docker push ghcr.io/lambdaclass/ethrex:latest
+docker push ghcr.io/lambdaclass/ethrex:l2
+</code></pre>
+<ul>
+<li>Delete the PAT for security (<a href="https://github.com/settings/tokens">here</a>)</li>
+</ul>
 
                     </main>
 
