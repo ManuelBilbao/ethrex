@@ -289,13 +289,17 @@ Node options:
 
       --log.level &lt;LOG_LEVEL&gt;
           Possible values: info, debug, trace, warn, error
-
+          
+          [env: ETHREX_LOG_LEVEL=]
           [default: INFO]
 
       --log.color &lt;LOG_COLOR&gt;
           Possible values: auto, always, never
 
           [default: auto]
+
+      --log.dir &lt;LOG_DIR&gt;
+          Directory to store log files.
 
       --mempool.maxsize &lt;MEMPOOL_MAX_SIZE&gt;
           Maximum size of the mempool in number of transactions
@@ -332,10 +336,15 @@ P2P options:
 
           [default: 1000]
 
-      --target.peers &lt;MAX_PEERS&gt;
-          Max amount of connected peers.
-
-          [default: 100]
+      --p2p.target-peers &lt;MAX_PEERS&gt;
+           Max amount of connected peers.
+ 
+           [default: 100]
+ 
+      --p2p.lookup-interval &lt;INITIAL_LOOKUP_INTERVAL&gt;
+          Initial Lookup Time Interval (ms) to trigger each Discovery lookup message and RLPx connection attempt.
+          
+         [default: 100]
 
 RPC options:
       --http.addr &lt;ADDRESS&gt;
@@ -386,7 +395,7 @@ Block building options:
       --builder.extra-data &lt;EXTRA_DATA&gt;
           Block extra data message.
 
-          [default: "ethrex 7.0.0"]
+          [default: "ethrex 8.0.0"]
 
       --builder.gas-limit &lt;GAS_LIMIT&gt;
           Target block gas limit.
@@ -456,7 +465,8 @@ Node options:
 
       --log.level &lt;LOG_LEVEL&gt;
           Possible values: info, debug, trace, warn, error
-
+          
+          [env: ETHREX_LOG_LEVEL=]
           [default: INFO]
 
       --log.color &lt;LOG_COLOR&gt;
@@ -553,7 +563,7 @@ Block building options:
       --builder.extra-data &lt;EXTRA_DATA&gt;
           Block extra data message.
 
-          [default: "ethrex 7.0.0"]
+          [default: "ethrex 8.0.0"]
 
       --builder.gas-limit &lt;GAS_LIMIT&gt;
           Target block gas limit.
