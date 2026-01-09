@@ -54,7 +54,6 @@ COPY fixtures/genesis ./fixtures/genesis
 COPY .git ./.git
 COPY Cargo.* ./
 COPY fixtures ./fixtures
-COPY .git ./.git
 COPY .cargo/ ./.cargo
 
 # Optional build flags
