@@ -33,8 +33,11 @@ RUN cargo chef prepare --recipe-path recipe.json
 # previous stage has changed, which only happens when dependencies change.
 FROM chef AS builder
 
+# Build flags must be declared before cargo chef cook to cache L2 dependencies
+ARG BUILD_FLAGS=""
+
 COPY --from=planner /ethrex/recipe.json recipe.json
-RUN cargo chef cook --release --recipe-path recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json $BUILD_FLAGS
 
 RUN  if [ "$(uname -m)" = aarch64 ]; \
     then \
@@ -56,8 +59,6 @@ COPY Cargo.* ./
 COPY fixtures ./fixtures
 COPY .cargo/ ./.cargo
 
-# Optional build flags
-ARG BUILD_FLAGS=""
 ENV COMPILE_CONTRACTS=true
 RUN cargo build --release $BUILD_FLAGS
 
