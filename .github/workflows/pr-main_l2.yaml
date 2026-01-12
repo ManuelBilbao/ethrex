@@ -118,6 +118,7 @@ jobs:
       - name: Build L1 docker image
         uses: ./.github/actions/build-docker
         with:
+          registry: ghcr.io
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           tags: ethrex:main
@@ -146,6 +147,7 @@ jobs:
       - name: Build L2 docker image
         uses: ./.github/actions/build-docker
         with:
+          registry: ghcr.io
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           tags: ethrex:main-l2
