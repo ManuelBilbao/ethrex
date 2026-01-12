@@ -11,6 +11,7 @@ inputs:
   registry:
     description: "Docker registry to push the image to (if pushing)"
     required: false
+    default: ghcr.io
   tags:
     description: "Comma-separated list of tags to apply to the built image"
     required: false
