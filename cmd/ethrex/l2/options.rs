@@ -37,7 +37,7 @@ pub struct Options {
     #[arg(
         long = "sponsorable-addresses",
         value_name = "SPONSORABLE_ADDRESSES_PATH",
-        help = "Path to a file ning addresses of contracts to which ethrex_SendTransaction should sponsor txs",
+        help = "Path to a file ning addresses o contracts to which ethrex_SendTransaction should sponsor txs",
         help_heading = "L2 options"
     )]
     pub sponsorable_addresses_file_path: Option<String>,
