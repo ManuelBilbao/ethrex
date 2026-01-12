@@ -104,7 +104,7 @@ runs:
         cache-from: |
           type=registry,ref=${{ inputs.registry }}/manuelbilbao/ethrex:cache-${{ steps.cache-config.outputs.cache_scope }}-${{ inputs.variant }}-${{ steps.cache-config.outputs.platform_safe }}
           type=registry,ref=${{ inputs.registry }}/manuelbilbao/ethrex:cache-main-${{ inputs.variant }}-${{ steps.cache-config.outputs.platform_safe }}
-        cache-to: ${{ (inputs.username != '' && inputs.password != '' && inputs.registry != '') && format('type=registry,ref={0}/manuelbilbao/ethrex:cache-{1}-{2}-{3},mode=max', inputs.registry, steps.cache-config.outputs.cache_scope, inputs.variant, steps.cache-config.outputs.platform_safe) || '' }}
+        cache-to: type=registry,ref=${{ inputs.registry }}/manuelbilbao/ethrex:cache-${{ steps.cache-config.outputs.cache_scope }}-${{ inputs.variant }}-${{ steps.cache-config.outputs.platform_safe }},mode=max
         build-args: ${{ inputs.build_args }}
         platforms: ${{ inputs.platforms }}
 
